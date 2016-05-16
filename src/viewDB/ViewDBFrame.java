@@ -110,22 +110,57 @@ class ViewDBFrame extends JFrame {
 
 	private void saveChanges() {
 		// TODO Auto-generated method stub
-
+		try(Connection conn=dcon.getConnection()){
+			dataPanel.setRow(crs);
+			crs.acceptChanges(conn);		
+		} catch (SQLException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e);
+		}
 	}
 
 	private void deleteRow() {
 		// TODO Auto-generated method stub
-
+		try (Connection conn=dcon.getConnection()){
+			crs.deleteRow();
+			crs.acceptChanges(conn);
+			if(!crs.isLast()) crs.next();
+			else if(!crs.isFirst()) crs.previous();
+			else crs=null;
+			dataPanel.showRow(crs);	
+		} catch (SQLException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e);
+		}
 	}
 
 	private void showNextRow() {
 		// TODO Auto-generated method stub
-
+		try {
+			if(crs==null||crs.isLast()) return;
+			crs.next();
+			dataPanel.showRow(crs);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block			
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, e);
+		}
 	}
 
 	private void showPreviousRow() {
 		// TODO Auto-generated method stub
-
+		try {
+			if(crs==null||crs.isFirst()) return;
+			crs.previous();
+			dataPanel.showRow(crs);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e);
+		}
+		
 	}
 
 	private void showTable(String tableName) {
@@ -140,6 +175,7 @@ class ViewDBFrame extends JFrame {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, e);
 			}
 			if (scrollPane != null)
 				remove(scrollPane);
